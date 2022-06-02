@@ -1,0 +1,33 @@
+steps:
+  
+- task: DotNetCoreCLI@2
+  displayName: "restore"
+  inputs:
+    command: restore 
+    projects: '$(System.DefaultWorkingDirectory)/azure-keyvault-encryption-demos-csharp/*.csproj'
+- task: DotNetCoreCLI@2
+  displayName: "build"
+  inputs:
+    command: build
+    arguments: '--configuration Release'
+    projects: '$(System.DefaultWorkingDirectory)/azure-keyvault-encryption-demos-csharp/*.csproj'
+- task: DotNetCoreCLI@2
+  displayName: "Publish files"
+  inputs:
+    command: publish
+    arguments: '--configuration Release --output publish_output'
+    projects: '$(System.DefaultWorkingDirectory)/azure-keyvault-encryption-demos-csharp/*.csproj'
+    publishWebProjects: false
+    modifyOutputPath: false
+    zipAfterPublish: false
+- task: ArchiveFiles@2
+  displayName: "Archive files"
+  inputs:
+    rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output"
+    includeRootFolder: false
+    archiveFile: "$(System.DefaultWorkingDirectory)/azure-keyvault-encryption-demos-csharp/csharpbuild$(Build.BuildId).zip"
+- task: PublishBuildArtifacts@1
+  displayName: "Publish Build Artifacts"
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/azure-keyvault-encryption-demos-csharp/csharpbuild$(Build.BuildId).zip'
+    artifactName: 'drop'

@@ -1,0 +1,23 @@
+trigger:
+  - none
+
+parameters:
+  - name: choose_tech
+    type: string
+    default: 'python'
+    values:
+      - 'python'
+      - 'csharp'
+
+jobs:
+- job: Build
+  workspace:
+    clean: all
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - checkout: self
+  - ${{ if eq(parameters.choose_tech, 'python') }}:
+    - template: /azure-keyvault-encryption-demos-python/azure-pipelines.yml
+  - ${{ if eq(parameters.choose_tech, 'csharp') }}:
+    - template: /azure-keyvault-encryption-demos-csharp/azure-pipelines.yml
