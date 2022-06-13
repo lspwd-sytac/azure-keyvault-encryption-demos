@@ -1,0 +1,5 @@
+/samples/java/persistence/target/
+/samples/nodejs/node_modules/
+/samples/nodejs/.npmrc
+/nodejs.iml
+/samples/nodejs/*.bat
