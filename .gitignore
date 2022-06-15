@@ -3,3 +3,4 @@
 /samples/nodejs/.npmrc
 /nodejs.iml
 /samples/nodejs/*.bat
+/samples/golang/vendor/
