@@ -17,18 +17,13 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class WrappingTest {
-
-
-    private static CryptographyClient cryptoClient;
-    private static ObjectMapper mapper;
+class WrappingTest {
 
     private static KeyVaultWrapper wrapper;
 
-
     @BeforeAll
     static void setup() {
-        mapper = JsonMapper.builder()
+        ObjectMapper mapper = JsonMapper.builder()
                 .findAndAddModules()
                 .build();
 
@@ -49,7 +44,7 @@ public class WrappingTest {
         var keyId = System.getenv().get("AZ_KEY_ID");
         assertNotNull(keyId);
 
-        cryptoClient = new CryptographyClientBuilder()
+        CryptographyClient cryptoClient = new CryptographyClientBuilder()
                 .keyIdentifier(keyId)
                 .credential(clientCertificateCredential)
                 .buildClient();
@@ -58,11 +53,11 @@ public class WrappingTest {
     }
 
     @Test
-    public void testWillSerializeInstants() throws IOException {
+    void testWillWrapAndUnwrapSuccessfully() throws IOException {
         var eof = wrapper.encrypt(SampleObject.builder().secretValue("AAAA").build());
         var decr = wrapper.decrypt(eof, SampleObject.class);
 
-        assertEquals(decr.getSecretValue(), "AAAA");
+        assertEquals("AAAA", decr.getSecretValue());
     }
 
 }

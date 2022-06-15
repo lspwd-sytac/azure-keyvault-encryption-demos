@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class WrappingPersistenceTest {
 
 
-    private static CryptographyClient cryptoClient;
     private static ObjectMapper mapper;
 
     private static KeyVaultWrapper wrapper;
@@ -57,7 +56,7 @@ public class WrappingPersistenceTest {
         var keyId = System.getenv().get("AZ_KEY_ID");
         assertNotNull(keyId);
 
-        cryptoClient = new CryptographyClientBuilder()
+        CryptographyClient cryptoClient = new CryptographyClientBuilder()
                 .keyIdentifier(keyId)
                 .credential(clientCertificateCredential)
                 .buildClient();
@@ -66,7 +65,7 @@ public class WrappingPersistenceTest {
     }
 
     @Test
-    public void testWillSerializeInstants() throws JsonProcessingException {
+    void testWillSerializeInstants() throws JsonProcessingException {
         ProtectedSampleObject pso = ProtectedSampleObject.builder()
                 .eof(EncryptedObjectFragment.builder().build())
                 .build();
@@ -74,7 +73,7 @@ public class WrappingPersistenceTest {
     }
 
     @Test
-    public void testWillProtectDocumentInDatabase() throws IOException {
+    void testWillProtectDocumentInDatabase() throws IOException {
         InputOutputRunner.runCycle("secure", this::createPersistenceUnderTest);
     }
 
