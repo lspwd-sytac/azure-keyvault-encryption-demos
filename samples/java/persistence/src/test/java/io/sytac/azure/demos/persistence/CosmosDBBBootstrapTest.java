@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-public class CosmosDBBBootstrapTest {
+class CosmosDBBBootstrapTest {
 
     @Test
-    public void testBasicReadWrite() throws IOException {
+    void testBasicReadWrite() throws IOException {
         InputOutputRunner.runCycle("insecure", this::createPersistenceUnderTest);
     }
 
