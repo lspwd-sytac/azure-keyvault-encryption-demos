@@ -35,7 +35,7 @@ func (kvw *KeyVaultWrapper) Unwrap(fragment *EncryptedObjectFragment, obj interf
 	}); err != nil {
 		return err
 	} else {
-		skivJSON, err := base64.StdEncoding.DecodeString(*res.Result)
+		skivJSON, err := base64.RawStdEncoding.DecodeString(*res.Result)
 		if err != nil {
 			return err
 		}
@@ -47,7 +47,10 @@ func (kvw *KeyVaultWrapper) Unwrap(fragment *EncryptedObjectFragment, obj interf
 		}
 
 		kiv := KeyAndIV{}
-		kiv.deserialize(skiv)
+		err = kiv.deserialize(skiv)
+		if err != nil {
+			return err
+		}
 
 		payloadCipherTextBytes, _ := base64.StdEncoding.DecodeString(fragment.MarshalledValue)
 		payloadBytes, err := AesDecrypt(&kiv, &payloadCipherTextBytes)
