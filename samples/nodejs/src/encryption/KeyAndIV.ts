@@ -1,6 +1,10 @@
-export class KeyAndIV {
-    public cipher?: string
-    public key?: Buffer
-    public IV?: Buffer
-    public tagLength?: number
+import {EncryptionKey} from "./EncryptionKey";
+import {InitializationVector} from "./InitializationVector";
+
+export interface KeyAndIV {
+    cipherName?: string
+    key?: EncryptionKey
+    IV?: InitializationVector
+
+    tagLength?: number
 }

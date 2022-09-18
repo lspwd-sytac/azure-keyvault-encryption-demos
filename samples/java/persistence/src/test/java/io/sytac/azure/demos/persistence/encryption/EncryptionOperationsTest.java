@@ -1,7 +1,7 @@
 package io.sytac.azure.demos.persistence.encryption;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.sytac.encryption.*;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.BadPaddingException;
@@ -21,7 +21,7 @@ public class EncryptionOperationsTest {
 
     @Test
     public void testWillEncryptUsingRandom() throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        var kiv = KeyAndIVFactory.defaultRandom();
+        var kiv = GCMKeyAndIVFactory.defaultRandom();
         var plainInput = StringPlaintext.builder().string("12345").build();
 
         AuthenticatedCiphertext encr = AES.encrypt(kiv, plainInput);
@@ -32,7 +32,7 @@ public class EncryptionOperationsTest {
 
     @Test()
     public void testWillRequireAADToDecrypt() throws IOException {
-        var kiv = KeyAndIVFactory.defaultRandom();
+        var kiv = GCMKeyAndIVFactory.defaultRandom();
         var plainInput = StringPlaintext.builder().string("12345").build();
 
         AuthenticatedCiphertext encr = AES.encrypt(kiv, AdditionalAuthenticationData.fromString("aad-string"), plainInput);
@@ -41,8 +41,6 @@ public class EncryptionOperationsTest {
                 .msg(encr)
                 .kiv(kiv)
                 .build();
-
-        Files.write(Path.of("../java-output.json"), new ObjectMapper().writeValueAsBytes(dto));
 
         assertThrows(BadPaddingException.class, () -> {
             AES.decrypt(kiv, encr);
@@ -54,8 +52,23 @@ public class EncryptionOperationsTest {
     }
 
     @Test()
+    public void testExportInteroperableExchange() throws IOException {
+        var kiv = GCMKeyAndIVFactory.defaultRandom();
+        var plainInput = StringPlaintext.builder().string("12345").build();
+
+        AuthenticatedCiphertext encr = AES.encrypt(kiv, AdditionalAuthenticationData.fromString("aad-string"), plainInput);
+
+        var dto = KeyAndCiphertextTransferDTO.builder()
+                .msg(encr)
+                .kiv(kiv)
+                .build();
+
+        Files.write(Path.of("../../java-output.json"), new ObjectMapper().writeValueAsBytes(dto));
+    }
+
+    @Test()
     public void testWillRequireAADToDecryptAndWillSucceed() throws BadPaddingException {
-        var kiv = KeyAndIVFactory.defaultRandom();
+        var kiv = GCMKeyAndIVFactory.defaultRandom();
         var plainInput = StringPlaintext.builder().string("12345").build();
 
         AuthenticatedCiphertext encr = AES.encrypt(kiv, AdditionalAuthenticationData.fromString("aad-string"), plainInput);
@@ -66,7 +79,7 @@ public class EncryptionOperationsTest {
 
     @Test
     public void testWillEncryptInStreamMode() throws IOException {
-        var kiv = KeyAndIVFactory.defaultRandom();
+        var kiv = GCMKeyAndIVFactory.defaultRandom();
 
         String plainInput = "ABCDEFGH";
         ByteArrayOutputStream cipherText = new ByteArrayOutputStream();

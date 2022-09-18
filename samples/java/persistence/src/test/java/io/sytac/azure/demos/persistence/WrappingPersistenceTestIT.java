@@ -6,10 +6,7 @@ import com.azure.security.keyvault.keys.cryptography.CryptographyClient;
 import com.azure.security.keyvault.keys.cryptography.CryptographyClientBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
 import com.mongodb.client.MongoCollection;
 import io.sytac.azure.demos.persistence.wrapping.EncryptedObjectFragment;
 import io.sytac.azure.demos.persistence.wrapping.KeyVaultWrapper;
@@ -20,13 +17,10 @@ import org.junit.jupiter.api.Test;
 
 import javax.crypto.BadPaddingException;
 import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class WrappingPersistenceTest {
+public class WrappingPersistenceTestIT {
 
 
     private static ObjectMapper mapper;

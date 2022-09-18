@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-class CosmosDBBBootstrapTest {
+class CosmosDBBBootstrapTestIT {
 
     @Test
     void testBasicReadWrite() throws IOException {
