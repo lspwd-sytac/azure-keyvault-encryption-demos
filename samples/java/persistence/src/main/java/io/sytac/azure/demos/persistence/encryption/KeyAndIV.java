@@ -13,11 +13,15 @@ import java.security.spec.AlgorithmParameterSpec;
 public class KeyAndIV {
     @Builder.Default
     private String cipher = "AES/GCM/NoPadding";
-    private byte[] IV;
-    private byte[] key;
+    private InitializationVector IV;
+    private EncryptionKey key;
+
+    /**
+     * Desired length of the authentication tag, in bits.
+     */
     private int tagLength;
 
     public AlgorithmParameterSpec createAlgorithmSpec() {
-        return new GCMParameterSpec(tagLength, IV);
+        return new GCMParameterSpec(tagLength, IV.getValue());
     }
 }

@@ -1,5 +1,6 @@
 package io.sytac.azure.demos.persistence;
 
+import javax.crypto.BadPaddingException;
 import java.io.IOException;
 
 public interface ProtectionDecorator<TFrom, TTo> {

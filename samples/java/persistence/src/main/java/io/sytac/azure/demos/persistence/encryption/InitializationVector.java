@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data @Builder
-public class CiphertextAndTag {
-    private byte[] ciphertext;
-    private byte[] tag;
+public class InitializationVector {
+    private byte[] value;
 }

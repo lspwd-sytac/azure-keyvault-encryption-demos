@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import javax.crypto.BadPaddingException;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -96,14 +97,18 @@ public class WrappingPersistenceTest {
 
         @Override
         public SampleObject restore(ProtectedSampleObject fromProtected) throws IOException {
-            SampleObjectProtectedPart sopp = wrapper.decrypt(fromProtected.getEof(), SampleObjectProtectedPart.class);
+            try {
+                SampleObjectProtectedPart sopp = wrapper.decrypt(fromProtected.getEof(), SampleObjectProtectedPart.class);
 
-            return SampleObject.builder()
-                    .guid(fromProtected.getGuid())
-                    .value(fromProtected.getValue())
-                    .secretValue(sopp.getSecretValue())
-                    .anotherSecretValue(sopp.getAnotherSecretValue())
-                    .build();
+                return SampleObject.builder()
+                        .guid(fromProtected.getGuid())
+                        .value(fromProtected.getValue())
+                        .secretValue(sopp.getSecretValue())
+                        .anotherSecretValue(sopp.getAnotherSecretValue())
+                        .build();
+            } catch (BadPaddingException ex) {
+                throw new IOException(ex);
+            }
         }
 
         private SampleObjectProtectedPart protectedPartOf(SampleObject so) {

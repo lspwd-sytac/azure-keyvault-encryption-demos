@@ -4,20 +4,19 @@ import com.azure.identity.ClientCertificateCredential;
 import com.azure.identity.ClientCertificateCredentialBuilder;
 import com.azure.security.keyvault.keys.cryptography.CryptographyClient;
 import com.azure.security.keyvault.keys.cryptography.CryptographyClientBuilder;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import io.sytac.azure.demos.persistence.ProtectedSampleObject;
 import io.sytac.azure.demos.persistence.SampleObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import javax.crypto.BadPaddingException;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class WrappingTest {
+class WrappingTestIT {
 
     private static KeyVaultWrapper wrapper;
 
@@ -53,7 +52,7 @@ class WrappingTest {
     }
 
     @Test
-    void testWillWrapAndUnwrapSuccessfully() throws IOException {
+    void testWillWrapAndUnwrapSuccessfully() throws IOException, BadPaddingException {
         var eof = wrapper.encrypt(SampleObject.builder().secretValue("AAAA").build());
         var decr = wrapper.decrypt(eof, SampleObject.class);
 

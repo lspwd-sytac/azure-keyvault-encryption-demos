@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bson.Document;
 
+import javax.crypto.BadPaddingException;
 import java.io.IOException;
 import java.util.Map;
 
