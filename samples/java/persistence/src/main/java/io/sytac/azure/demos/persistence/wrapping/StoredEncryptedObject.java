@@ -1,11 +1,7 @@
 package io.sytac.azure.demos.persistence.wrapping;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.sytac.azure.demos.persistence.encryption.AdditionalAuthenticationData;
-import lombok.Data;
-
-import java.time.Instant;
+import io.sytac.encryption.AdditionalAuthenticationData;
 
 /**
  * A base class for storing the encrypted object fragment and calculating the additional authentication data,

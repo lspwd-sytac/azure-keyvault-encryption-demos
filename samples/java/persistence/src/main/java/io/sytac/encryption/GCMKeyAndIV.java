@@ -1,4 +1,4 @@
-package io.sytac.azure.demos.persistence.encryption;
+package io.sytac.encryption;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,9 +10,9 @@ import java.security.spec.AlgorithmParameterSpec;
 
 @Data
 @Builder @NoArgsConstructor @AllArgsConstructor
-public class KeyAndIV {
+public class GCMKeyAndIV implements KeyAndIV {
     @Builder.Default
-    private String cipher = "AES/GCM/NoPadding";
+    private String cipherName = "AES/GCM/NoPadding";
     private InitializationVector IV;
     private EncryptionKey key;
 
@@ -21,6 +21,7 @@ public class KeyAndIV {
      */
     private int tagLength;
 
+    @Override
     public AlgorithmParameterSpec createAlgorithmSpec() {
         return new GCMParameterSpec(tagLength, IV.getValue());
     }

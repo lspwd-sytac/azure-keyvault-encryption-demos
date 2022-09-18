@@ -3,9 +3,10 @@ package io.sytac.azure.demos.persistence.wrapping;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.sytac.azure.demos.persistence.encryption.AuthenticatedCiphertext;
-import io.sytac.azure.demos.persistence.encryption.AuthenticationTag;
-import io.sytac.azure.demos.persistence.encryption.Ciphertext;
+import io.sytac.encryption.AuthenticatedCiphertext;
+import io.sytac.encryption.AuthenticationTag;
+import io.sytac.encryption.Ciphertext;
+import io.sytac.encryption.GCMKeyAndIV;
 import lombok.*;
 
 import java.time.Instant;
@@ -18,7 +19,7 @@ import java.time.Instant;
  * <ol>
  *     <li>Obtain access to the key encryption key (KEK) referenced by {@link #getKek()}</li>
  *     <li>Using the KEK, unwrap the value of {@link #getWrappedKey()}</li>
- *     <li>Restore the {@link io.sytac.azure.demos.persistence.encryption.KeyAndIV}</li>
+ *     <li>Restore the {@link GCMKeyAndIV}</li>
  *     <li>Restore the data by decrypting the {@link #getSerializedValue()}</li>
  * </ol>
  */

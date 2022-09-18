@@ -1,8 +1,8 @@
-package io.sytac.azure.demos.persistence.encryption;
+package io.sytac.encryption;
 
 import java.security.SecureRandom;
 
-public class KeyAndIVFactory {
+public class GCMKeyAndIVFactory {
     static final SecureRandom random = new SecureRandom();
 
     static final int DEFAULT_AES_KEY_BYTE_LENGTH = 128/8;
@@ -33,6 +33,6 @@ public class KeyAndIVFactory {
         byte[] key = new byte[keyBytes];
         random.nextBytes(key);
 
-        return KeyAndIV.builder().IV(new InitializationVector(iv)).key(new EncryptionKey(key)).tagLength(tagLengthBits).build();
+        return GCMKeyAndIV.builder().IV(new InitializationVector(iv)).key(new EncryptionKey(key)).tagLength(tagLengthBits).build();
     }
 }

@@ -1,4 +1,4 @@
-package io.sytac.azure.demos.persistence.encryption;
+package io.sytac.encryption;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -17,7 +17,7 @@ public class AES {
 
     public static AuthenticatedCiphertext encrypt(KeyAndIV kiv, AdditionalAuthenticationData aad, Plaintext... source) {
         try {
-            Cipher ch = Cipher.getInstance(kiv.getCipher());
+            Cipher ch = Cipher.getInstance(kiv.getCipherName());
 
             SecretKeySpec sks = new SecretKeySpec(kiv.getKey().getValue(), AES_ALGORITHM);
             ch.init(Cipher.ENCRYPT_MODE, sks, kiv.createAlgorithmSpec());
@@ -78,7 +78,7 @@ public class AES {
      */
     public static void encryptStream(KeyAndIV kiv, AdditionalAuthenticationData aad, InputStream plain, OutputStream out) throws IOException {
         try {
-            Cipher ch = Cipher.getInstance(kiv.getCipher());
+            Cipher ch = Cipher.getInstance(kiv.getCipherName());
 
             SecretKeySpec sks = new SecretKeySpec(kiv.getKey().getValue(), AES_ALGORITHM);
             if (aad != null) {
@@ -105,7 +105,7 @@ public class AES {
 
     public static BinaryPlaintext decrypt(KeyAndIV kiv, AdditionalAuthenticationData aad, AuthenticatedCiphertext text) throws BadPaddingException, javax.crypto.AEADBadTagException {
         try {
-            Cipher ch = Cipher.getInstance(kiv.getCipher());
+            Cipher ch = Cipher.getInstance(kiv.getCipherName());
             SecretKeySpec sks = new SecretKeySpec(kiv.getKey().getValue(), AES_ALGORITHM);
             ch.init(Cipher.DECRYPT_MODE, sks, kiv.createAlgorithmSpec());
             if (aad != null) {
@@ -122,7 +122,7 @@ public class AES {
 
     public static InputStream decrypt(KeyAndIV kiv, InputStream cipherText, AuthenticationTag tag) throws IOException {
         try {
-            Cipher ch = Cipher.getInstance(kiv.getCipher());
+            Cipher ch = Cipher.getInstance(kiv.getCipherName());
             SecretKeySpec sks = new SecretKeySpec(kiv.getKey().getValue(), AES_ALGORITHM);
             ch.init(Cipher.DECRYPT_MODE, sks, kiv.createAlgorithmSpec());
 

@@ -1,4 +1,4 @@
-package io.sytac.azure.demos.persistence.encryption;
+package io.sytac.encryption;
 
 public interface Plaintext {
     byte[] getValue();

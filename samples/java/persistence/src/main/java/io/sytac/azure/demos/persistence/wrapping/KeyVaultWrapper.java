@@ -3,7 +3,7 @@ package io.sytac.azure.demos.persistence.wrapping;
 import com.azure.security.keyvault.keys.cryptography.CryptographyClient;
 import com.azure.security.keyvault.keys.cryptography.models.KeyWrapAlgorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sytac.azure.demos.persistence.encryption.*;
+import io.sytac.encryption.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -45,7 +45,7 @@ public class KeyVaultWrapper {
     }
 
     public <T> EncryptedObjectFragment encrypt(T other, AdditionalAuthenticationData aad) throws IOException {
-        return encrypt(other, KeyAndIVFactory.defaultRandom(), aad);
+        return encrypt(other, GCMKeyAndIVFactory.defaultRandom(), aad);
     }
 
     public <T> EncryptedObjectFragment encrypt(T other, KeyAndIV kiv, AdditionalAuthenticationData aad) throws IOException {
@@ -69,7 +69,7 @@ public class KeyVaultWrapper {
     }
     public <T> T decrypt(EncryptedObjectFragment eof, AdditionalAuthenticationData aad, Class<T> clazz) throws IOException, BadPaddingException {
         var kivBytes = kvCryptoClient.unwrapKey(wrapAlgorithm, b64Dec.decode(eof.getWrappedKey())).getKey();
-        KeyAndIV kiv = objectMapper.readValue(kivBytes, KeyAndIV.class);
+        GCMKeyAndIV kiv = objectMapper.readValue(kivBytes, GCMKeyAndIV.class);
 
         var plainPayload = AES.decrypt(kiv, aad, eof.getAuthenticatedCipherText());
         return objectMapper.readValue(plainPayload.getValue(), clazz);
