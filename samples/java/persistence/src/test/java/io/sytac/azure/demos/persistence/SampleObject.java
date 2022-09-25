@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 
@@ -19,8 +20,11 @@ public class SampleObject {
     private String secretValue;
     private int anotherSecretValue;
 
+    @Builder.Default
+    private Instant lastModified = Instant.now();
+
     public static Map<String,Object> identify(SampleObject obj) {
-        assertNotNull(obj.getGuid(), () -> "Assign ID ot this object before storing it in the database");
+        assertNotNull(obj.getGuid(), "Assign ID ot this object before storing it in the database");
         return Collections.singletonMap("guid", obj.getGuid());
     }
 }

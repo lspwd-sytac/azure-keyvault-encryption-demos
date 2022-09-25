@@ -1,6 +1,7 @@
 package io.sytac.azure.demos.persistence;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +18,8 @@ class CosmosDBBBootstrapTestIT {
 
     @NotNull
     protected ApplicationPersistence<SampleObject> createPersistenceUnderTest(MongoCollection<Document> coll) {
-        return new CosmosDBPersistenceImpl<>(coll, new ObjectMapper(), SampleObject.class);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return new CosmosDBPersistence<>(coll, mapper, SampleObject.class);
     }
 }

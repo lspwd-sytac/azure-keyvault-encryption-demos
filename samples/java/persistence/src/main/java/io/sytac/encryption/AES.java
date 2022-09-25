@@ -34,14 +34,12 @@ public class AES {
                 byte[] finalOp = ch.doFinal();
 
                 int tagLengthInBytes = kiv.getTagLength() / 8;
-                int remainingContentLength = finalOp.length - tagLengthInBytes;
+                int tagOffset = finalOp.length - tagLengthInBytes;
 
-                baos.write(finalOp, 0, remainingContentLength);
-
-                var startStartIndex = remainingContentLength;
+                baos.write(finalOp, 0, tagOffset);
 
                 return rv.ciphertext(new Ciphertext(baos.toByteArray()))
-                        .tag(new AuthenticationTag(finalOp, startStartIndex, tagLengthInBytes))
+                        .tag(new AuthenticationTag(finalOp, tagOffset, tagLengthInBytes))
                         .build();
             } catch (IOException ex) {
                 throw new IllegalStateException(ex);
@@ -54,11 +52,11 @@ public class AES {
 
     /**
      * Encrypts the plain text and outputs the ciphertext with the authentication tag stripped.
-     * @param kiv
-     * @param plain
-     * @param out
-     * @return
-     * @throws IOException
+     * @param kiv Key and initialization vector
+     * @param plain plain-test stream
+     * @param out output stream where to store encrypted test
+     * @return authentication tag
+     * @throws IOException if I/O operations would fail
      */
     public static AuthenticationTag encrypt(KeyAndIV kiv, InputStream plain, OutputStream out) throws IOException {
         return encrypt(kiv, null, plain, out);
@@ -88,7 +86,7 @@ public class AES {
 
             try (CipherOutputStream cos = new CipherOutputStream(out, ch)) {
                 byte[] buf = new byte[10240];
-                int k = 0;
+                int k;
                 while ((k = plain.read(buf)) > 0) {
                     cos.write(buf, 0, k);
                 }
@@ -103,7 +101,7 @@ public class AES {
         return decrypt(kiv, null, text);
     }
 
-    public static BinaryPlaintext decrypt(KeyAndIV kiv, AdditionalAuthenticationData aad, AuthenticatedCiphertext text) throws BadPaddingException, javax.crypto.AEADBadTagException {
+    public static BinaryPlaintext decrypt(KeyAndIV kiv, AdditionalAuthenticationData aad, AuthenticatedCiphertext text) throws BadPaddingException {
         try {
             Cipher ch = Cipher.getInstance(kiv.getCipherName());
             SecretKeySpec sks = new SecretKeySpec(kiv.getKey().getValue(), AES_ALGORITHM);
@@ -120,7 +118,7 @@ public class AES {
         }
     }
 
-    public static InputStream decrypt(KeyAndIV kiv, InputStream cipherText, AuthenticationTag tag) throws IOException {
+    public static InputStream decrypt(KeyAndIV kiv, InputStream cipherText, AuthenticationTag tag) {
         try {
             Cipher ch = Cipher.getInstance(kiv.getCipherName());
             SecretKeySpec sks = new SecretKeySpec(kiv.getKey().getValue(), AES_ALGORITHM);

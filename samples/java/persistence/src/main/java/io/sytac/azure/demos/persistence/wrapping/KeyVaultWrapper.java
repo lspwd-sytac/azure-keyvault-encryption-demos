@@ -11,6 +11,7 @@ import javax.crypto.BadPaddingException;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class KeyVaultWrapper {
@@ -26,20 +27,6 @@ public class KeyVaultWrapper {
 
     private final KeyWrapAlgorithm wrapAlgorithm = KeyWrapAlgorithm.RSA_OAEP_256;
 
-    public <ILogical, TStorage extends StoredEncryptedObject, TProtected> TStorage wrap(ILogical inst, StorageMapper<ILogical, TStorage, TProtected> mapper) throws IOException {
-        var storeObj = mapper.mapStorageStruct(inst);
-        var protectedPart = mapper.mapProtectedStruct(inst);
-        var enc = encrypt(protectedPart, storeObj.getAdditionalAuthenticationData());
-
-        storeObj.setEncryptedFragment(enc);
-        return storeObj;
-    }
-
-    public <ILogical, TStorage extends StoredEncryptedObject, TProtected> ILogical unwrap(TStorage storage, StorageMapper<ILogical, TStorage, TProtected> mapper) throws IOException, BadPaddingException {
-        var decryptedProtectedPart = decrypt(storage.getEncryptedFragment(), storage.getAdditionalAuthenticationData(), mapper.getProtectedStructClass());
-        return mapper.restore(storage, decryptedProtectedPart);
-    }
-
     public <T> EncryptedObjectFragment encrypt(T other) throws IOException {
         return encrypt(other, null);
     }
@@ -50,7 +37,7 @@ public class KeyVaultWrapper {
 
     public <T> EncryptedObjectFragment encrypt(T other, KeyAndIV kiv, AdditionalAuthenticationData aad) throws IOException {
         var encObject = AES.encrypt(kiv, aad, new BinaryPlaintext(objectMapper.writeValueAsBytes(other)));
-        var wrappedKey = kvCryptoClient.wrapKey(wrapAlgorithm, objectMapper.writeValueAsBytes(kiv)).getEncryptedKey();
+        var wrappedKey = kvCryptoClient.wrapKey(wrapAlgorithm, objectMapper.writeValueAsBytes(kiv.serialize())).getEncryptedKey();
 
         return EncryptedObjectFragment.builder()
                 .encryptionDate(Instant.now())
@@ -67,9 +54,14 @@ public class KeyVaultWrapper {
     public <T> T decrypt(EncryptedObjectFragment eof, Class<T> clazz) throws IOException, BadPaddingException {
         return decrypt(eof, null, clazz);
     }
+
     public <T> T decrypt(EncryptedObjectFragment eof, AdditionalAuthenticationData aad, Class<T> clazz) throws IOException, BadPaddingException {
+        return decrypt(eof, aad, clazz, GCMKeyAndIV::deserialize);
+    }
+    public <T> T decrypt(EncryptedObjectFragment eof, AdditionalAuthenticationData aad, Class<T> clazz, Function<SerializedKeyAndIV, KeyAndIV> deserializer) throws IOException, BadPaddingException {
         var kivBytes = kvCryptoClient.unwrapKey(wrapAlgorithm, b64Dec.decode(eof.getWrappedKey())).getKey();
-        GCMKeyAndIV kiv = objectMapper.readValue(kivBytes, GCMKeyAndIV.class);
+        SerializedKeyAndIV skiv = objectMapper.readValue(kivBytes, SerializedKeyAndIV.class);
+        KeyAndIV kiv = deserializer.apply(skiv);
 
         var plainPayload = AES.decrypt(kiv, aad, eof.getAuthenticatedCipherText());
         return objectMapper.readValue(plainPayload.getValue(), clazz);

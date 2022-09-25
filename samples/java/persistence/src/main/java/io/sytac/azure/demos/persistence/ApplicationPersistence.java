@@ -1,13 +1,16 @@
 package io.sytac.azure.demos.persistence;
 
 import lombok.NonNull;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 
-import javax.crypto.BadPaddingException;
 import java.io.IOException;
 import java.util.Map;
 
 public interface ApplicationPersistence<TVal> {
-    void store(@NonNull TVal val, @NonNull ObjectIdSupplier<TVal> idSupplier) throws IOException;
+    String store(@NonNull TVal val, @NonNull ObjectIdSupplier<TVal> idSupplier) throws IOException;
 
-    TVal get(@NonNull Map<String, Object> reqKey) throws IOException;
+    ObjectId idOf(Document key) throws IOException;
+
+    DBIdentifiedObject<TVal> get(@NonNull Map<String, Object> reqKey) throws IOException;
 }

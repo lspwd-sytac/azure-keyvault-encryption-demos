@@ -15,4 +15,6 @@ public interface KeyAndIV {
     EncryptionKey getKey();
 
     int getTagLength();
+
+    SerializedKeyAndIV serialize();
 }

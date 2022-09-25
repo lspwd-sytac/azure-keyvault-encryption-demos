@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.mongodb.client.MongoCollection;
 import io.sytac.azure.demos.persistence.wrapping.EncryptedObjectFragment;
 import io.sytac.azure.demos.persistence.wrapping.KeyVaultWrapper;
+import io.sytac.encryption.AdditionalAuthenticationData;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
@@ -73,26 +74,28 @@ public class WrappingPersistenceTestIT {
     }
 
     @NotNull ApplicationPersistence<SampleObject> createPersistenceUnderTest(MongoCollection<Document> coll) {
-        return new WrappingPersistenceImpl<>(
+        return new ProtectionDecoratingPersistence<>(
                 new SampleObjectProtectionDecorator(),
-                new CosmosDBPersistenceImpl<>(coll, mapper, ProtectedSampleObject.class)
+                new CosmosDBPersistence<>(coll, mapper, ProtectedSampleObject.class)
         );
     }
 
     static class SampleObjectProtectionDecorator implements ProtectionDecorator<SampleObject, ProtectedSampleObject> {
         @Override
-        public ProtectedSampleObject apply(SampleObject upon) throws IOException {
+        public ProtectedSampleObject apply(SampleObject upon, String dbId) throws IOException {
             return ProtectedSampleObject.builder()
                     .guid(upon.getGuid())
                     .value(upon.getValue())
-                    .eof(wrapper.encrypt(protectedPartOf(upon)))
+                    .eof(wrapper.encrypt(protectedPartOf(upon), AdditionalAuthenticationData.fromString(dbId)))
                     .build();
         }
 
         @Override
-        public SampleObject restore(ProtectedSampleObject fromProtected) throws IOException {
+        public SampleObject restore(ProtectedSampleObject fromProtected, String dbId) throws IOException {
             try {
-                SampleObjectProtectedPart sopp = wrapper.decrypt(fromProtected.getEof(), SampleObjectProtectedPart.class);
+                SampleObjectProtectedPart sopp = wrapper.decrypt(fromProtected.getEof(),
+                        AdditionalAuthenticationData.fromString(dbId),
+                        SampleObjectProtectedPart.class);
 
                 return SampleObject.builder()
                         .guid(fromProtected.getGuid())
