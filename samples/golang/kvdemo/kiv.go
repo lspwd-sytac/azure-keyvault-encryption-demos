@@ -18,7 +18,7 @@ type KeyAndIV struct {
 	tagLength int
 }
 
-func (kiv KeyAndIV) serialize() SerializedKeyAndIV {
+func (kiv *KeyAndIV) serialize() SerializedKeyAndIV {
 
 	return SerializedKeyAndIV{
 		Cipher:    kiv.Cipher,
@@ -28,11 +28,23 @@ func (kiv KeyAndIV) serialize() SerializedKeyAndIV {
 	}
 }
 
-func (kiv KeyAndIV) deserialize(kvw SerializedKeyAndIV) {
+func (kiv *KeyAndIV) deserialize(kvw SerializedKeyAndIV) error {
 	kiv.Cipher = kvw.Cipher
-	kiv.Key, _ = base64.StdEncoding.DecodeString(kvw.Key)
-	kiv.IV, _ = base64.StdEncoding.DecodeString(kvw.IV)
+	var err error
+
+	kiv.Key, err = base64.StdEncoding.DecodeString(kvw.Key)
+	if err != nil {
+		return err
+	}
+
+	kiv.IV, err = base64.StdEncoding.DecodeString(kvw.IV)
+	if err != nil {
+		return err
+	}
+
 	kiv.tagLength = kvw.TagLength
+
+	return nil
 }
 
 type SerializedKeyAndIV struct {

@@ -16,7 +16,7 @@ type SampleObject struct {
 }
 
 func TestBase64Decoding(t *testing.T) {
-	str, err := base64.StdEncoding.DecodeString("eyJjaXBoZXIiOiJhZXMtMTI4LWdjbSIsImsiOiIrdXhjTS9LMis1WEo4QWFNNlJVemNnPT0iLCJpdiI6ImpNd0JKUjZhRUVjZTZXQ1oiLCJ0Ijo5Nn0====")
+	str, err := base64.RawStdEncoding.DecodeString("eyJjaXBoZXIiOiJhZXMtMTI4LWdjbSIsImsiOiIrdXhjTS9LMis1WEo4QWFNNlJVemNnPT0iLCJpdiI6ImpNd0JKUjZhRUVjZTZXQ1oiLCJ0Ijo5Nn0")
 	assert.Nil(t, err)
 	fmt.Println(string(str))
 }
