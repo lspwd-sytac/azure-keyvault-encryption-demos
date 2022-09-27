@@ -11,6 +11,10 @@ public class AES {
 
     private static final String AES_ALGORITHM = "AES";
 
+    private AES() {
+        // This class should not be instantiated directly.
+    }
+
     public static AuthenticatedCiphertext encrypt(KeyAndIV kiv, Plaintext... sources) {
         return encrypt(kiv, null, sources);
     }
@@ -23,25 +27,28 @@ public class AES {
             ch.init(Cipher.ENCRYPT_MODE, sks, kiv.createAlgorithmSpec());
             if (aad != null) ch.updateAAD(aad.getValue());
 
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                var rv = AuthenticatedCiphertext.builder();
-                for (Plaintext s : source) baos.write(ch.update(s.getValue()));
-                byte[] finalOp = ch.doFinal();
-
-                int tagLengthInBytes = kiv.getTagLength() / 8;
-                int tagOffset = finalOp.length - tagLengthInBytes;
-
-                baos.write(finalOp, 0, tagOffset);
-
-                return rv.ciphertext(new Ciphertext(baos.toByteArray()))
-                        .tag(new AuthenticationTag(finalOp, tagOffset, tagLengthInBytes))
-                        .build();
-            } catch (IOException ex) {
-                throw new IllegalStateException(ex);
-            }
+            return encrypt(ch, source, kiv.getTagLength() / 8);
         } catch  (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
                 | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             throw new IllegalStateException("The JVM does not support encryption parameters required by the key", e);
+        }
+    }
+
+    private static AuthenticatedCiphertext encrypt(Cipher ch, Plaintext[] source, int tagLengthInBytes) throws IllegalBlockSizeException, BadPaddingException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            var rv = AuthenticatedCiphertext.builder();
+            for (Plaintext s : source) baos.write(ch.update(s.getValue()));
+            byte[] finalOp = ch.doFinal();
+
+            int tagOffset = finalOp.length - tagLengthInBytes;
+
+            baos.write(finalOp, 0, tagOffset);
+
+            return rv.ciphertext(new Ciphertext(baos.toByteArray()))
+                    .tag(new AuthenticationTag(finalOp, tagOffset, tagLengthInBytes))
+                    .build();
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
         }
     }
 
@@ -146,6 +153,10 @@ public class AES {
             this.bufPtr = 0;
             this.minimalFill = false;
         }
+
+        // Ideally we may want to provide the implementation of the write(array, int, int) method
+        // to gain performance. This demo code does not contain this code as it deemed to be
+        // over-complication of the basic encryption demonstration.
 
         @Override
         public void write(int b) throws IOException {
