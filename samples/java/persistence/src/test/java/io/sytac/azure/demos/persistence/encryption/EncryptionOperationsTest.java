@@ -14,10 +14,10 @@ import java.time.Instant;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EncryptionOperationsTest {
+class EncryptionOperationsTest {
 
     @Test
-    public void testWillEncryptUsingRandom() throws BadPaddingException {
+    void testWillEncryptUsingRandom() throws BadPaddingException {
         var kiv = GCMKeyAndIVFactory.defaultRandom();
         var plainInput = StringPlaintext.builder().string("12345").build();
 
@@ -28,7 +28,7 @@ public class EncryptionOperationsTest {
     }
 
     @Test()
-    public void testWillRequireAADToDecrypt() {
+    void testWillRequireAADToDecrypt() {
         var kiv = GCMKeyAndIVFactory.defaultRandom();
         var plainInput = StringPlaintext.builder().string("12345").build();
 
@@ -40,7 +40,7 @@ public class EncryptionOperationsTest {
     }
 
     @Test()
-    public void testExportInteroperableExchangeWithAD() throws IOException {
+    void testExportInteroperableExchangeWithAD() throws IOException {
         var kiv = GCMKeyAndIVFactory.defaultRandom();
         var plainInput = StringPlaintext.builder().string(String.format("authenticated-12345-%s", Instant.now().toString())).build();
 
@@ -55,7 +55,7 @@ public class EncryptionOperationsTest {
     }
 
     @Test()
-    public void testExportInteroperableExchange() throws IOException {
+    void testExportInteroperableExchange() throws IOException {
         var kiv = GCMKeyAndIVFactory.defaultRandom();
         var plainInput = StringPlaintext.builder().string(String.format("non-authenticated-12345-%s", Instant.now().toString())).build();
 
@@ -73,7 +73,7 @@ public class EncryptionOperationsTest {
     }
 
     @Test()
-    public void testWillRequireAADToDecryptAndWillSucceed() throws BadPaddingException {
+    void testWillRequireAADToDecryptAndWillSucceed() throws BadPaddingException {
         var kiv = GCMKeyAndIVFactory.defaultRandom();
         var plainInput = StringPlaintext.builder().string("12345").build();
 
@@ -84,7 +84,7 @@ public class EncryptionOperationsTest {
     }
 
     @Test
-    public void testWillEncryptInStreamMode() throws IOException {
+    void testWillEncryptInStreamMode() throws IOException {
         var kiv = GCMKeyAndIVFactory.defaultRandom();
 
         String plainInput = "ABCDEFGH";
