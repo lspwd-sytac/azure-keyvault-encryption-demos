@@ -44,7 +44,8 @@ public class InputOutputRunner {
                     .value("12345")
                     .secretValue("This is something you should only see on the console")
                     .build();
-            persister.store(exampleWrite, SampleObject::identify);
+            var storedId = persister.store(exampleWrite, SampleObject::identify);
+            assertNotNull(storedId);
 
             var exampleRead = persister.get(Collections.singletonMap("guid", "a-b-c"));
             assertEquals("12345", exampleRead.getValue().getValue());
