@@ -21,16 +21,11 @@ public class AES {
 
             SecretKeySpec sks = new SecretKeySpec(kiv.getKey().getValue(), AES_ALGORITHM);
             ch.init(Cipher.ENCRYPT_MODE, sks, kiv.createAlgorithmSpec());
-            if (aad != null) {
-                ch.updateAAD(aad.getValue());
-            }
+            if (aad != null) ch.updateAAD(aad.getValue());
 
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 var rv = AuthenticatedCiphertext.builder();
-                for (Plaintext s : source) {
-                    baos.write(ch.update(s.getValue()));
-                }
-
+                for (Plaintext s : source) baos.write(ch.update(s.getValue()));
                 byte[] finalOp = ch.doFinal();
 
                 int tagLengthInBytes = kiv.getTagLength() / 8;
