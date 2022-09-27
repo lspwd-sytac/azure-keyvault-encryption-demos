@@ -28,8 +28,8 @@ public class AES {
             if (aad != null) ch.updateAAD(aad.getValue());
 
             return encrypt(ch, source, kiv.getTagLength() / 8);
-        } catch  (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
-                | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
+                 | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             throw new IllegalStateException("The JVM does not support encryption parameters required by the key", e);
         }
     }
@@ -54,15 +54,17 @@ public class AES {
 
     /**
      * Encrypts the plain text and outputs the ciphertext with the authentication tag stripped.
-     * @param kiv Key and initialization vector
+     *
+     * @param kiv   Key and initialization vector
      * @param plain plain-test stream
-     * @param out output stream where to store encrypted test
+     * @param out   output stream where to store encrypted test
      * @return authentication tag
      * @throws IOException if I/O operations would fail
      */
     public static AuthenticationTag encrypt(KeyAndIV kiv, InputStream plain, OutputStream out) throws IOException {
         return encrypt(kiv, null, plain, out);
     }
+
     public static AuthenticationTag encrypt(KeyAndIV kiv, AdditionalAuthenticationData aad, InputStream plain, OutputStream out) throws IOException {
         TrailingBytesExtractingOutputStream tbs = new TrailingBytesExtractingOutputStream(kiv, out);
         encryptStream(kiv, aad, plain, tbs);
@@ -71,9 +73,10 @@ public class AES {
 
     /**
      * Create a cipher from the supplied key and initialization vector and then encrypt the plain-text stream.
-     * @param kiv key and initialization vector
+     *
+     * @param kiv   key and initialization vector
      * @param plain plain input stream
-     * @param out output stream where to store the ciphertext
+     * @param out   output stream where to store the ciphertext
      * @throws IOException if the output into the target stream will fail .
      */
     public static void encryptStream(KeyAndIV kiv, AdditionalAuthenticationData aad, InputStream plain, OutputStream out) throws IOException {
@@ -108,14 +111,14 @@ public class AES {
             Cipher ch = Cipher.getInstance(kiv.getCipherName());
             SecretKeySpec sks = new SecretKeySpec(kiv.getKey().getValue(), AES_ALGORITHM);
             ch.init(Cipher.DECRYPT_MODE, sks, kiv.createAlgorithmSpec());
-            if (aad != null) {
-                ch.updateAAD(aad.getValue());
-            }
+            if (aad != null) ch.updateAAD(aad.getValue());
+
             ch.update(text.getCiphertext().getValue());
 
             var decryptedBinary = ch.doFinal(text.getTag().getValue());
             return new BinaryPlaintext(decryptedBinary);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException | IllegalBlockSizeException  ex) {
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException |
+                 InvalidKeyException | IllegalBlockSizeException ex) {
             throw new IllegalStateException("The JVM does not support required key", ex);
         }
     }
@@ -178,12 +181,12 @@ public class AES {
             byte[] retVal = new byte[tailLength];
             int rvPtr = 0;
 
-            for (int k = bufPtr; k< tailLength; k++) {
-                retVal[rvPtr] = (byte)this.tailBuffer[k];
+            for (int k = bufPtr; k < tailLength; k++) {
+                retVal[rvPtr] = (byte) this.tailBuffer[k];
                 rvPtr++;
             }
-            for (int k=0; k<bufPtr; k++) {
-                retVal[rvPtr] = (byte)this.tailBuffer[k];
+            for (int k = 0; k < bufPtr; k++) {
+                retVal[rvPtr] = (byte) this.tailBuffer[k];
                 rvPtr++;
             }
 
