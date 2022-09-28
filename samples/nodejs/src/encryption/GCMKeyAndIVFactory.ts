@@ -1,8 +1,8 @@
 import {KeyAndIV} from "./KeyAndIV";
 import {SerializedKeyAndIV} from "./SerializedKeyAndIV";
-import crypto = require('crypto');
 import {EncryptionKey} from "./EncryptionKey";
 import {InitializationVector} from "./InitializationVector";
+import crypto = require('crypto');
 
 class GCMKeyAndIV implements KeyAndIV {
     IV: InitializationVector;
@@ -16,6 +16,15 @@ class GCMKeyAndIV implements KeyAndIV {
         this.cipherName = cipherName;
         this.key = key;
         this.tagLength = tagLength;
+    }
+
+    serialize(): SerializedKeyAndIV {
+        return {
+            key: this.key.value.toString('base64'),
+            iv: this.IV.value.toString('base64'),
+            cipherName: this.cipherName,
+            tagLength: this.tagLength
+        }
     }
 }
 
@@ -40,21 +49,12 @@ export class GCMKeyAndIVFactory {
         );
     }
 
-    static serialize(kiv: KeyAndIV): SerializedKeyAndIV {
-        return {
-            key: kiv.key ? kiv.key.value.toString('base64') : undefined,
-            IV: kiv.IV ? kiv.IV.value.toString('base64') : undefined,
-            cipher: kiv.cipherName,
-            tagLength: kiv.tagLength
-        }
-    }
-
     static deserialize(skiv: SerializedKeyAndIV): KeyAndIV {
-        if (skiv.cipher && skiv.key && skiv.IV && skiv.tagLength) {
+        if (skiv.cipherName && skiv.key && skiv.iv && skiv.tagLength) {
             return new GCMKeyAndIV(
-                skiv.cipher,
+                skiv.cipherName,
                 new EncryptionKey(Buffer.from(skiv.key, 'base64')),
-                new InitializationVector(Buffer.from(skiv.IV, 'base64')),
+                new InitializationVector(Buffer.from(skiv.iv, 'base64')),
                 skiv.tagLength
             );
         } else {

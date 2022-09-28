@@ -29,9 +29,13 @@ class InterOpExchange {
 }
 
 let javaMessage: InterOpExchange
+let javaMessageWithAD: InterOpExchange
 before(() => {
-    const rawJS = fs.readFileSync("../java-output.json")
+    let rawJS = fs.readFileSync("../java-output.json")
     javaMessage = JSON.parse(rawJS.toString()) as InterOpExchange
+
+    rawJS = fs.readFileSync("../java-output-with-ad.json")
+    javaMessageWithAD = JSON.parse(rawJS.toString()) as InterOpExchange
 })
 
 describe('AES decryption of Java-based outputs', () => {
@@ -42,6 +46,31 @@ describe('AES decryption of Java-based outputs', () => {
         expect(cipherTextBytes).to.not.be.undefined
         expect(authTagBytes).to.not.be.undefined
 
+        if (cipherTextBytes && authTagBytes) {
+            const authenticatedCipherText = new AuthenticatedCiphertext(
+                new Ciphertext(Buffer.from(cipherTextBytes, 'base64')),
+                new AuthenticationTag(Buffer.from(authTagBytes, 'base64')),
+            )
+
+            const serializedKIV: SerializedKeyAndIV = {
+                cipherName: 'aes-128-gcm',
+                key: javaMessage.kiv?.key?.value,
+                iv: javaMessage.kiv?.iv?.value,
+                tagLength: authenticatedCipherText.tag.value.length * 8
+            }
+
+            const kiv = GCMKeyAndIVFactory.deserialize(serializedKIV)
+
+            const plainBinary = AESGCM.decrypt(kiv, authenticatedCipherText)
+            console.log(plainBinary.asStringPlaintext())
+        }
+    })
+    it('should correctly decrypt value with AD', () => {
+        const cipherTextBytes = javaMessageWithAD.msg?.ciphertext?.value
+        const authTagBytes = javaMessageWithAD.msg?.tag?.value
+
+        expect(cipherTextBytes).to.not.be.undefined
+        expect(authTagBytes).to.not.be.undefined
 
         if (cipherTextBytes && authTagBytes) {
             const authenticatedCipherText = new AuthenticatedCiphertext(
@@ -50,18 +79,16 @@ describe('AES decryption of Java-based outputs', () => {
             )
 
             const serializedKIV: SerializedKeyAndIV = {
-                cipher: 'aes-128-gcm',
-                key: javaMessage.kiv?.key?.value,
-                IV: javaMessage.kiv?.iv?.value,
+                cipherName: 'aes-128-gcm',
+                key: javaMessageWithAD.kiv?.key?.value,
+                iv: javaMessageWithAD.kiv?.iv?.value,
                 tagLength: authenticatedCipherText.tag.value.length * 8
             }
 
             const kiv = GCMKeyAndIVFactory.deserialize(serializedKIV)
+            const aad = AdditionalAuthenticationData.fromString('aad-string')
 
-
-            console.log(authenticatedCipherText.tag.value.length)
-
-            const plainBinary = AESGCM.decryptWithAD(kiv, authenticatedCipherText, AdditionalAuthenticationData.fromString('aad-string'))
+            const plainBinary = AESGCM.decryptWithAD(kiv, authenticatedCipherText, aad)
             console.log(plainBinary.asStringPlaintext())
         }
     })

@@ -1,6 +1,6 @@
 export class SerializedKeyAndIV {
     public key?: string
-    public IV?: string
-    public cipher?: string
+    public iv?: string
+    public cipherName?: string
     public tagLength?: number
 }

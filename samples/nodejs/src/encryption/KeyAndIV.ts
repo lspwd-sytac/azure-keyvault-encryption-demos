@@ -1,5 +1,6 @@
 import {EncryptionKey} from "./EncryptionKey";
 import {InitializationVector} from "./InitializationVector";
+import {SerializedKeyAndIV} from "./SerializedKeyAndIV";
 
 export interface KeyAndIV {
     cipherName?: string
@@ -7,4 +8,6 @@ export interface KeyAndIV {
     IV?: InitializationVector
 
     tagLength?: number
+
+    serialize(): SerializedKeyAndIV;
 }

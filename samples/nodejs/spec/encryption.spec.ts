@@ -21,7 +21,7 @@ describe("AES encryption", () => {
 
         const encr = AESGCM.encrypt(kiv, new StringPlaintext(text))
 
-        const skiv = GCMKeyAndIVFactory.serialize(kiv)
+        const skiv = kiv.serialize()
         const desc = AESGCM.decrypt(GCMKeyAndIVFactory.deserialize(skiv), encr)
 
         expect(desc.toString()).to.be.eq(text)

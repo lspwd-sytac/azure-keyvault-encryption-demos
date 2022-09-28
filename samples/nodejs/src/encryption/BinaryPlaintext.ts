@@ -27,10 +27,7 @@ export class StringPlaintext implements Plaintext {
         this.value = value;
     }
 
-
     asBuffer(): Buffer {
         return Buffer.from(this.value)
     }
-
-
 }
