@@ -6,3 +6,4 @@
 /samples/golang/vendor/
 /.idea/
 /samples/*-output.json
+/samples/*-output-with-ad.json
