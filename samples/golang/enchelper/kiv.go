@@ -28,7 +28,7 @@ func (kiv *KeyAndIV) serialize() SerializedKeyAndIV {
 	}
 }
 
-func (kiv *KeyAndIV) deserialize(kvw SerializedKeyAndIV) error {
+func (kiv *KeyAndIV) Deserialize(kvw SerializedKeyAndIV) error {
 	kiv.Cipher = kvw.Cipher
 	var err error
 
