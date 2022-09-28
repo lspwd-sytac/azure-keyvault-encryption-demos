@@ -1,9 +1,6 @@
 package kvdemo
 
 import (
-	"context"
-	"encoding/base64"
-	"encoding/json"
 	"github.com/Azure/azure-sdk-for-go/services/keyvault/v7.0/keyvault"
 	"time"
 )
@@ -28,6 +25,7 @@ type KeyVaultWrapper struct {
 	keyVersion   string
 }
 
+/*
 func (kvw *KeyVaultWrapper) Unwrap(fragment *EncryptedObjectFragment, obj interface{}) error {
 	if res, err := kvw.cryptoClient.UnwrapKey(context.TODO(), kvw.vaultURL, kvw.keyName, kvw.keyVersion, keyvault.KeyOperationsParameters{
 		Algorithm: keyvault.RSAOAEP256,
@@ -86,3 +84,4 @@ func (kvw *KeyVaultWrapper) Wrap(obj interface{}) (*EncryptedObjectFragment, err
 		return &rv, nil
 	}
 }
+*/

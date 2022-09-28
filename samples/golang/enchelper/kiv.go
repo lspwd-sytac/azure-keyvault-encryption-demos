@@ -1,4 +1,4 @@
-package kvdemo
+package enchelper
 
 import (
 	"crypto/rand"

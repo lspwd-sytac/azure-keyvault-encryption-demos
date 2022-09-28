@@ -3,10 +3,7 @@ package kvdemo
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/Azure/azure-sdk-for-go/services/keyvault/v7.0/keyvault"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
@@ -21,6 +18,7 @@ func TestBase64Decoding(t *testing.T) {
 	fmt.Println(string(str))
 }
 
+/*
 func TestVaultWrappingAndUnwrapping(t *testing.T) {
 	tenantId := os.Getenv("AZ_TENANT_ID")
 	clientId := os.Getenv("AZ_CLIENT_ID")
@@ -55,3 +53,4 @@ func TestVaultWrappingAndUnwrapping(t *testing.T) {
 
 	assert.EqualValues(t, plain, decr)
 }
+*/
